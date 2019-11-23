@@ -2,10 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-
+#include <stdbool.h>
 #define MAX_SIZE 20000
 #define name_size 100
 #define heap_size 10 //need extra index for insertion? or replace smallest element?
+#define expected_columns 16
 
 int current_heap_size = 0;
 
@@ -16,13 +17,38 @@ struct tweet {
 
 struct tweet hashmap[MAX_SIZE];
 
+bool validColumns(char* line){
+  int comma_count = 0;
+  for (int i = 0; i < strlen(line); i++){
+    if (line[i] == ','){
+      comma_count++;
+    }
+  }
+
+  //expect 16 columns -> 15 commas
+  return comma_count + 1 == expected_columns;
+}
+
+int getNameColumn(char* line){
+  char* pos_ptr = strstr(line, "name");
+
+  int comma_count = 0;
+  for (int i = 0; i < strlen(pos_ptr); i++){
+    if (pos_ptr[i] == ','){
+      comma_count++;
+    }
+  }
+
+  return expected_columns - 1 - comma_count;
+}
+
 char* getfield(char* line, int num)
 {
   int comma_count = 0;
   char* name = malloc(1024 * 4);
 
   for (int i = 0; i < strlen(line); i++){
-    if (comma_count == 8){
+    if (comma_count == num){
       int index = 0;
       while (line[i + index] != ','){
         name[index] = line[i + index];
@@ -175,20 +201,29 @@ int comparator(const void* p1, const void* p2)
 
 int main()
 {
+
+
     FILE* stream = fopen("cl-tweets-short-clean.csv", "r");
     struct tweet * heap = malloc(heap_size * sizeof(struct tweet));
-    //hashmap = malloc(MAX_SIZE * sizeof(struct tweet));
 
-    //struct tweet heap = malloc(10 * sizeof(struct tweet));
     char line[1024];
+    char temp[1024];
+    fgets(line, 1024, stream);
+    strcpy(temp, line);
 
-    int i = 0;
+    if (!validColumns(temp)){
+      printf("Invalid Input File\n");
+      return -1;
+    }
+
+    int nameColumn = getNameColumn(temp);
+
     while (fgets(line, 1024, stream))
     {
-        char temp[1024];
+
         strcpy(temp, line);
 
-        char* name = getfield(temp, 8);
+        char* name = getfield(temp, nameColumn);
 
         long hashcode = hashCode(name);
 
@@ -211,7 +246,6 @@ int main()
             }
         }
 
-        i++;
     }
 
     //iterate();
