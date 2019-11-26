@@ -54,6 +54,41 @@ int getNameColumn(char* line){
   return expected_columns - 1 - comma_count;
 }
 
+char* trim(char* name){
+  int quote_count = 0;
+
+  if (strlen(name) > 1){
+    quote_count = name[0] == '\"'? 1 : 0;
+    quote_count = name[strlen(name) - 1] == '\"'? quote_count + 1 : quote_count;
+
+    switch (quote_count) {
+      case 0:
+        return name;
+      case 1:
+        error();
+        break;
+      case 2:
+        name++;
+        char* temp = malloc((strlen(name) - 1) * 4);
+
+        int index = 0;
+        while (name[index + 1] != '\0'){
+            temp[index] = name[index];
+            index++;
+        }
+
+        return temp;
+        break;
+      default:
+        return name;
+    }
+
+  }
+
+  return name;
+
+}
+
 char* getfield(char* line, int num)
 {
   int comma_count = 0;
@@ -67,7 +102,7 @@ char* getfield(char* line, int num)
         index++;
       }
 
-      return name;
+      return trim(name);
     }
 
     if (line[i] == ','){
@@ -173,4 +208,5 @@ int main(int argc, char* argv[])
     {
         printf("%s: %d\n", hashmap[i].name, hashmap[i].count);
     }
+
 }
