@@ -5,7 +5,6 @@
 #include <stdbool.h>
 #define MAX_SIZE 20000
 #define name_size 100
-#define heap_size 10 //need extra index for insertion? or replace smallest element?
 #define expected_columns 16
 
 int current_heap_size = 0;
@@ -93,14 +92,24 @@ int comparator(const void* p1, const void* p2)
    return second - first;
 }
 
-
-
-int main()
+void error()
 {
+    printf("Invalid Input File\n");
+    exit(1);
+}
 
 
-    FILE* stream = fopen("cl-tweets-short-clean.csv", "r");
-    struct tweet * heap = malloc(heap_size * sizeof(struct tweet));
+int main(int argc, char* argv[])
+{
+    if(argc != 2)
+    {
+        error();
+    }
+    FILE* stream = fopen(argv[1], "r");
+    if(stream == NULL)
+    {
+        error();
+    }
 
     char line[1024];
     char temp[1024];
@@ -108,8 +117,7 @@ int main()
     strcpy(temp, line);
 
     if (!validColumns(temp)){
-      printf("Invalid Input File\n");
-      return -1;
+      error();
     }
 
     int nameColumn = getNameColumn(temp);
@@ -144,10 +152,7 @@ int main()
 
     }
 
-    //iterate();
 	qsort((void*)hashmap, sizeof(hashmap) / sizeof(hashmap[0]), sizeof(hashmap[0]), comparator);
-    //buildHeap(heap);
-    //printHeap(heap);
     for(int i = 0; i < 10; i++)
     {
         printf("%s: %d\n", hashmap[i].name, hashmap[i].count);
