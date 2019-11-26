@@ -16,6 +16,12 @@ struct tweet {
 
 struct tweet hashmap[MAX_SIZE];
 
+void error()
+{
+    printf("Invalid Input File\n");
+    exit(1);
+}
+
 bool validColumns(char* line){
   int comma_count = 0;
   for (int i = 0; i < strlen(line); i++){
@@ -30,6 +36,10 @@ bool validColumns(char* line){
 
 int getNameColumn(char* line){
   char* pos_ptr = strstr(line, "name");
+
+  if (pos_ptr == NULL){
+    error();
+  }
 
   int comma_count = 0;
   for (int i = 0; i < strlen(pos_ptr); i++){
@@ -91,13 +101,6 @@ int comparator(const void* p1, const void* p2)
    int second = ((struct tweet *)p2)->count;
    return second - first;
 }
-
-void error()
-{
-    printf("Invalid Input File\n");
-    exit(1);
-}
-
 
 int main(int argc, char* argv[])
 {
