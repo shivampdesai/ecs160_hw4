@@ -8,6 +8,7 @@
 #define expected_columns 16
 
 int current_heap_size = 0;
+int line_count = 0;
 
 struct tweet {
     int count;
@@ -128,6 +129,10 @@ int main(int argc, char* argv[])
     while (fgets(line, 1024, stream))
     {
 
+        if (line_count == MAX_SIZE){
+          error();
+        }
+
         strcpy(temp, line);
 
         char* name = getfield(temp, nameColumn);
@@ -153,6 +158,8 @@ int main(int argc, char* argv[])
             }
         }
 
+        line_count++;
+
     }
 
 	qsort((void*)hashmap, sizeof(hashmap) / sizeof(hashmap[0]), sizeof(hashmap[0]), comparator);
@@ -160,5 +167,4 @@ int main(int argc, char* argv[])
     {
         printf("%s: %d\n", hashmap[i].name, hashmap[i].count);
     }
-
 }
