@@ -3,9 +3,11 @@
 #include <string.h>
 #include <math.h>
 #include <stdbool.h>
+
 #define MAX_SIZE 20000
 #define name_size 100
 #define expected_columns 16
+#define MAX_LINE_LENGTH 1024
 
 int current_heap_size = 0;
 int line_count = 0;
@@ -126,8 +128,12 @@ int main(int argc, char* argv[])
 
     int nameColumn = getNameColumn(temp);
 
-    while (fgets(line, 1024, stream))
+    while (fgets(line, 2048, stream))
     {
+
+      if (strlen(line) > MAX_LINE_LENGTH) {
+        error();
+      }
 
         if (line_count == MAX_SIZE){
           error();
