@@ -6,11 +6,12 @@
 
 #define MAX_SIZE 20000
 #define name_size 100
-#define expected_columns 16
 #define MAX_LINE_LENGTH 1024
 
+int expected_columns = 0;
 int current_heap_size = 0;
 int line_count = 0;
+bool name_quoted = false;
 
 struct tweet {
     int count;
@@ -33,25 +34,49 @@ bool validColumns(char* line){
     }
   }
 
-  //expect 16 columns -> 15 commas
-  return comma_count + 1 == expected_columns;
+  return comma_count == expected_columns;
 }
 
 int getNameColumn(char* line){
+
+  char* quote_ptr = strstr(line, "\"name\"");
   char* pos_ptr = strstr(line, "name");
 
-  if (pos_ptr == NULL){
+  if (quote_ptr + 1 == pos_ptr){
+    pos_ptr = strstr(pos_ptr + 1, "name");
+  }
+
+  if ((pos_ptr == NULL && quote_ptr == NULL) || (quote_ptr && pos_ptr)){
+    error();
+  }
+
+  char* ptr = NULL;
+
+  if (quote_ptr){
+    if (strstr(quote_ptr + 2, "name")){
+      error();
+    }
+
+    name_quoted = true;
+    ptr = quote_ptr;
+  } else if (pos_ptr) {
+    if (strstr(pos_ptr + 1, "name")){
+      error();
+    }
+
+    ptr = pos_ptr;
+  } else {
     error();
   }
 
   int comma_count = 0;
-  for (int i = 0; i < strlen(pos_ptr); i++){
-    if (pos_ptr[i] == ','){
+  for (int i = 0; i < strlen(ptr); i++){
+    if (ptr[i] == ','){
       comma_count++;
     }
   }
 
-  return expected_columns - 1 - comma_count;
+  return expected_columns - comma_count;
 }
 
 char* trim(char* name){
@@ -63,11 +88,19 @@ char* trim(char* name){
 
     switch (quote_count) {
       case 0:
+        if (name_quoted){
+          error();
+        }
+
         return name;
       case 1:
         error();
         break;
       case 2:
+        if (!name_quoted){
+            error();
+        }
+
         name++;
         char* temp = malloc((strlen(name) - 1) * 4);
 
@@ -140,13 +173,26 @@ int comparator(const void* p1, const void* p2)
    return second - first;
 }
 
+int getNumColumns(char* line){
+  int comma_count = 0;
+  for (int i = 0; i < strlen(line); i++){
+    if (line[i] == ','){
+      comma_count++;
+    }
+  }
+
+  return comma_count;
+}
+
 int main(int argc, char* argv[])
 {
-    if(argc != 2)
-    {
+    if (argc != 2){
         error();
     }
+
     FILE* stream = fopen(argv[1], "r");
+
+
     if(stream == NULL)
     {
         error();
@@ -157,12 +203,15 @@ int main(int argc, char* argv[])
     fgets(line, 1024, stream);
     strcpy(temp, line);
 
+    expected_columns = getNumColumns(temp);
+
     if (!validColumns(temp)){
       error();
     }
 
     int nameColumn = getNameColumn(temp);
 
+    int i = 0;
     while (fgets(line, 2048, stream))
     {
 
@@ -177,7 +226,6 @@ int main(int argc, char* argv[])
         strcpy(temp, line);
 
         char* name = getfield(temp, nameColumn);
-
         long hashcode = hashCode(name);
 
         if (hashmap[hashcode % MAX_SIZE].name == NULL){
