@@ -12,6 +12,7 @@ int expected_columns = 0;
 int current_heap_size = 0;
 int line_count = 0;
 bool name_quoted = false;
+bool name_last_column = false;
 
 struct tweet {
     int count;
@@ -80,6 +81,11 @@ int getNameColumn(char* line){
 
 char* trim(char* name){
     int quote_count = 0;
+
+    //remove new line character if name is in last column
+    if (name_last_column){
+      name[strlen(name) - 1] = '\0';
+    }
 
     if (strlen(name) > 1){
         quote_count = name[0] == '\"'? 1 : 0;
@@ -255,6 +261,10 @@ int main(int argc, char* argv[])
     }
 
     int nameColumn = getNameColumn(temp);
+
+    if (expected_columns == nameColumn){
+      name_last_column = true;
+    }
 
     while (fgets(line, 2 * MAX_LINE_LENGTH, stream))
     {
