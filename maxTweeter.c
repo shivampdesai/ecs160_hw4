@@ -38,7 +38,6 @@ bool validColumns(char* line){
 }
 
 int getNameColumn(char* line){
-
     char* quote_ptr = strstr(line, "\"name\"");
     char* pos_ptr = strstr(line, "name");
 
@@ -88,32 +87,32 @@ char* trim(char* name){
 
         switch (quote_count) {
             case 0:
-            if (name_quoted){
-                error();
-            }
+              if (name_quoted){
+                  error();
+              }
 
-            return name;
+              return name;
             case 1:
-            error();
-            break;
+              error();
+              break;
             case 2:
-            if (!name_quoted){
-                error();
-            }
+              if (!name_quoted){
+                  error();
+              }
 
-            name++;
-            char* temp = malloc((strlen(name) - 1) * 4);
+              name++;
+              char* temp = malloc((strlen(name) - 1) * 4);
 
-            int index = 0;
-            while (name[index + 1] != '\0'){
-                temp[index] = name[index];
-                index++;
-            }
+              int index = 0;
+              while (name[index + 1] != '\0'){
+                  temp[index] = name[index];
+                  index++;
+              }
 
-            return temp;
-            break;
+              return temp;
+              break;
             default:
-            return name;
+              return name;
         }
 
     }
@@ -221,7 +220,9 @@ void outputTopN(int n)
     qsort((void*)hashmap, sizeof(hashmap) / sizeof(hashmap[0]), sizeof(hashmap[0]), comparator);
     for(int i = 0; i < n; i++)
     {
-        printf("%s: %d\n", hashmap[i].name, hashmap[i].count);
+        if (hashmap[i].name != NULL){
+          printf("%s: %d\n", hashmap[i].name, hashmap[i].count);
+        }
     }
 }
 
