@@ -82,13 +82,13 @@ int getNameColumn(char* line){
 char* trim(char* name){
     int quote_count = 0;
 
-    //remove new line character if name is in last column
+    if (strlen(name) > 1){
+
+    	    //remove new line character if name is in last column
     if (name_last_column){
       name[strlen(name) - 1] = '\0';
-    }
-
-    if (strlen(name) > 1){
-        quote_count = name[0] == '\"'? 1 : 0;
+    	}
+	quote_count = name[0] == '\"'? 1 : 0;
         quote_count = name[strlen(name) - 1] == '\"'? quote_count + 1 : quote_count;
 
         switch (quote_count) {
@@ -196,7 +196,7 @@ void mapInsert(char* name)
 
     if (hashmap[hashcode % MAX_SIZE].name == NULL)
     {
-        hashmap[hashcode % MAX_SIZE].name = malloc(strlen(name) * 4);
+        hashmap[hashcode % MAX_SIZE].name = malloc((strlen(name) + 1) * 4);
         strcpy(hashmap[hashcode % MAX_SIZE].name, name);
         hashmap[hashcode % MAX_SIZE].count = 1;
     }
@@ -214,7 +214,7 @@ void mapInsert(char* name)
                 newIndex++;
             }
 
-            hashmap[newIndex].name = malloc(strlen(name) * 4);
+            hashmap[newIndex].name = malloc((strlen(name) + 1) * 4);
             strcpy(hashmap[newIndex].name, name);
             hashmap[newIndex].count = 1;
         }
