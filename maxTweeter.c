@@ -156,6 +156,10 @@ char* getfield(char* line, int num)
 long hashCode(const char *str) {
     long hash = 0;
 
+    if (str == NULL){
+	return hash;
+    }
+
     for (int i = 0; i < strlen(str); i++) {
         hash = 31 * hash + str[i];
 
@@ -193,8 +197,13 @@ int getNumColumns(char* line)
 
 void mapInsert(char* name)
 {
+    if (name == NULL){
+	name = malloc(24);
+	strcpy(name, "empty");
+    }
+    
     long hashcode = hashCode(name);
-
+   
     if (hashmap[hashcode % MAX_SIZE].name == NULL)
     {
         hashmap[hashcode % MAX_SIZE].name = malloc((strlen(name) + 1) * 4);
