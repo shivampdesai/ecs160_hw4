@@ -14,19 +14,31 @@ int line_count = 0;
 bool name_quoted = false;
 bool name_last_column = false;
 
+/*
+Struct to store each name and count
+*/
 struct tweet {
     int count;
     char* name;
 };
 
+/*
+Hashmap to keep track of count
+*/
 struct tweet hashmap[MAX_SIZE];
 
+/*
+Generic function to print out error message and exit
+*/
 void error()
 {
     printf("Invalid Input File\n");
     exit(1);
 }
 
+/*
+Check whether there is a valid number of columns in the line
+*/
 bool validColumns(char* line){
     int comma_count = 0;
     for (int i = 0; i < strlen(line); i++){
@@ -38,6 +50,9 @@ bool validColumns(char* line){
     return comma_count == expected_columns;
 }
 
+/*
+Parses the header line to find the column that contains the name
+*/
 int getNameColumn(char* line){
     char* quote_ptr = strstr(line, "\"name\"");
     char* pos_ptr = strstr(line, "name");
@@ -46,6 +61,7 @@ int getNameColumn(char* line){
         pos_ptr = strstr(pos_ptr + 1, "name");
     }
 
+    //if name or "name" is not found, or both are found
     if ((pos_ptr == NULL && quote_ptr == NULL) || (quote_ptr && pos_ptr)){
         error();
     }
@@ -53,6 +69,7 @@ int getNameColumn(char* line){
     char* ptr = NULL;
 
     if (quote_ptr){
+	//if name is found again
         if (strstr(quote_ptr + 2, "name")){
             error();
         }
@@ -60,6 +77,7 @@ int getNameColumn(char* line){
         name_quoted = true;
         ptr = quote_ptr;
     } else if (pos_ptr) {
+	//if name is found again
         if (strstr(pos_ptr + 1, "name")){
             error();
         }
@@ -79,6 +97,11 @@ int getNameColumn(char* line){
     return expected_columns - comma_count;
 }
 
+
+/*
+If the name has 2 outer quotes, remove and return the new name. If there is 
+only 1 return an error.
+*/
 char* trim(char* name){
     int quote_count = 0;
 
@@ -94,15 +117,18 @@ char* trim(char* name){
 
       switch (quote_count) {
           case 0:
+            //if name is expected to be quoted but is not
             if (name_quoted){
                 error();
             }
 
             return name;
           case 1:
+  	    //mismatch in outer quotes
             error();
             break;
           case 2:
+	    //if name is not supposed to be quoted but is	     
             if (!name_quoted){
                 error();
             }
@@ -127,6 +153,9 @@ char* trim(char* name){
     return name;
 }
 
+/*
+For a given line, return the value in the column that passed in
+*/
 char* getfield(char* line, int num)
 {
     int comma_count = 0;
@@ -152,7 +181,10 @@ char* getfield(char* line, int num)
     return "NULL";
 }
 
-
+/*
+Function to calculate hashCode of a name. Used labs to handle
+negative hashcodes.
+*/
 long hashCode(const char *str) {
     long hash = 0;
 
@@ -167,6 +199,9 @@ long hashCode(const char *str) {
     return labs(hash);
 }
 
+/*
+Print out all elements in the hashmap
+*/
 void iterate(){
     for (int i = 0; i < MAX_SIZE; i++){
         if (hashmap[i].name != NULL){
@@ -175,6 +210,9 @@ void iterate(){
     }
 }
 
+/*
+Comparator function to sort tweets in the hashmap
+*/
 int comparator(const void* p1, const void* p2)
 {
     int first = ((struct tweet *)p1)->count;
@@ -182,6 +220,9 @@ int comparator(const void* p1, const void* p2)
     return second - first;
 }
 
+/*
+Return the expected number of columns from the header line
+*/
 int getNumColumns(char* line)
 {
     int comma_count = 0;
@@ -194,11 +235,15 @@ int getNumColumns(char* line)
     return comma_count;
 }
 
+/*
+Inserts/increments the count of the given name in the hashmap 
+*/
 void mapInsert(char* name)
 {
+    //if the name passed in is NULL, assign it to 'empty' tweeter
     if (name == NULL){
-	     name = malloc(24);
-	     strcpy(name, "empty");
+	name = malloc(24);
+	strcpy(name, "empty");
     }
 
     long hashcode = hashCode(name);
@@ -230,6 +275,9 @@ void mapInsert(char* name)
     }
 }
 
+/*
+Outputs the top N tweets in the hashmap
+*/
 void outputTopN(int n)
 {
     qsort((void*)hashmap, sizeof(hashmap) / sizeof(hashmap[0]), sizeof(hashmap[0]), comparator);
@@ -243,14 +291,15 @@ void outputTopN(int n)
 
 int main(int argc, char* argv[])
 {
+    //if no input file is provided
     if (argc != 2){
         error();
     }
 
     FILE* stream = fopen(argv[1], "r");
 
-
-    if(stream == NULL)
+    //if an empty file is passed in
+    if (stream == NULL)
     {
         error();
     }
@@ -273,16 +322,23 @@ int main(int argc, char* argv[])
     }
 
     int nameColumn = getNameColumn(temp);
+    
     if (expected_columns == nameColumn){
       name_last_column = true;
     }
 
+    /*
+    Iterate over the lines in the input file -> retrive the name and 
+    insert into the hashmap.
+    */
     while (fgets(line, 2 * MAX_LINE_LENGTH, stream))
     {
+	//if size of line is greater than the max (1024)
         if (strlen(line) > MAX_LINE_LENGTH) {
             error();
         }
 
+	//if the number of lines read in is greater than max (20000)
         if (line_count == MAX_SIZE){
             error();
         }
@@ -291,7 +347,7 @@ int main(int argc, char* argv[])
 
         char* name = getfield(temp, nameColumn);
 
-	      mapInsert(name);
+	mapInsert(name);
 
         line_count++;
     }
