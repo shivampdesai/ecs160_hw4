@@ -128,14 +128,14 @@ char* trim(char* name){
 }
 
 char* getfield(char* line, int num)
-{
+{	
     int comma_count = 0;
     char* name = malloc(MAX_LINE_LENGTH * 4);
-
+    
     for (int i = 0; i < strlen(line); i++){
         if (comma_count == num){
             int index = 0;
-            while (line[i + index] != ','){
+            while (i + index < strlen(line) && line[i + index] != ','){
                 name[index] = line[i + index];
                 index++;
             }
@@ -148,6 +148,7 @@ char* getfield(char* line, int num)
         }
     }
 
+    free(name);
     return "NULL";
 }
 
@@ -261,7 +262,6 @@ int main(int argc, char* argv[])
     }
 
     int nameColumn = getNameColumn(temp);
-
     if (expected_columns == nameColumn){
       name_last_column = true;
     }
@@ -279,7 +279,8 @@ int main(int argc, char* argv[])
         strcpy(temp, line);
 
         char* name = getfield(temp, nameColumn);
-        mapInsert(name);
+        
+	mapInsert(name);
 
         line_count++;
 
