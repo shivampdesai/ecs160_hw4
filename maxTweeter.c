@@ -84,54 +84,54 @@ char* trim(char* name){
 
     if (strlen(name) > 1){
 
-    	    //remove new line character if name is in last column
-    if (name_last_column){
-      name[strlen(name) - 1] = '\0';
-    	}
-	quote_count = name[0] == '\"'? 1 : 0;
-        quote_count = name[strlen(name) - 1] == '\"'? quote_count + 1 : quote_count;
+      //remove new line character if name is in last column
+      if (name_last_column){
+        name[strlen(name) - 1] = '\0';
+      }
 
-        switch (quote_count) {
-            case 0:
-              if (name_quoted){
-                  error();
-              }
+      quote_count = name[0] == '\"'? 1 : 0;
+      quote_count = name[strlen(name) - 1] == '\"'? quote_count + 1 : quote_count;
 
-              return name;
-            case 1:
-              error();
-              break;
-            case 2:
-              if (!name_quoted){
-                  error();
-              }
+      switch (quote_count) {
+          case 0:
+            if (name_quoted){
+                error();
+            }
 
-              name++;
-              char* temp = malloc((strlen(name) - 1) * 4);
+            return name;
+          case 1:
+            error();
+            break;
+          case 2:
+            if (!name_quoted){
+                error();
+            }
 
-              int index = 0;
-              while (name[index + 1] != '\0'){
-                  temp[index] = name[index];
-                  index++;
-              }
+            name++;
+            char* temp = malloc((strlen(name) - 1) * 4);
 
-              return temp;
-              break;
-            default:
-              return name;
-        }
+            int index = 0;
+            while (name[index + 1] != '\0'){
+                temp[index] = name[index];
+                index++;
+            }
+
+            return temp;
+            break;
+          default:
+            return name;
+      }
 
     }
 
     return name;
-
 }
 
 char* getfield(char* line, int num)
-{	
+{
     int comma_count = 0;
     char* name = malloc(MAX_LINE_LENGTH * 4);
-    
+
     for (int i = 0; i < strlen(line); i++){
         if (comma_count == num){
             int index = 0;
@@ -157,12 +157,11 @@ long hashCode(const char *str) {
     long hash = 0;
 
     if (str == NULL){
-	return hash;
+	     return hash;
     }
 
     for (int i = 0; i < strlen(str); i++) {
         hash = 31 * hash + str[i];
-
     }
 
     return labs(hash);
@@ -198,12 +197,12 @@ int getNumColumns(char* line)
 void mapInsert(char* name)
 {
     if (name == NULL){
-	name = malloc(24);
-	strcpy(name, "empty");
+	     name = malloc(24);
+	     strcpy(name, "empty");
     }
-    
+
     long hashcode = hashCode(name);
-   
+
     if (hashmap[hashcode % MAX_SIZE].name == NULL)
     {
         hashmap[hashcode % MAX_SIZE].name = malloc((strlen(name) + 1) * 4);
@@ -258,10 +257,13 @@ int main(int argc, char* argv[])
 
     char line[2 * MAX_LINE_LENGTH];
     char temp[2 * MAX_LINE_LENGTH];
+
     fgets(line, 2 * MAX_LINE_LENGTH, stream);
+
     if (strlen(line) > MAX_LINE_LENGTH) {
         error();
     }
+
     strcpy(temp, line);
 
     expected_columns = getNumColumns(temp);
@@ -288,11 +290,13 @@ int main(int argc, char* argv[])
         strcpy(temp, line);
 
         char* name = getfield(temp, nameColumn);
-        
-	mapInsert(name);
+
+	      mapInsert(name);
 
         line_count++;
-
     }
+
     outputTopN(10);
+
+    return 0;
 }
