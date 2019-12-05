@@ -1,0 +1,11 @@
+id:000007,sig:11,src:000000,op:arith8,pos:110,val:-24	62
+id:000006,sig:11,src:000000,op:arith8,pos:44,val:-34	62
+id:000005,sig:11,src:000000,op:arith8,pos:38,val:-24	62
+id:000004,sig:11,src:000000,op:arith8,pos:4,val:-24	62
+id:000003,sig:11,src:000000,op:flip32,pos:169	62
+id:000002,sig:11,src:000000,op:flip32,pos:122	62
+id:000001,sig:11,src:000000,op:flip1,pos:80	62
+id:000000,sig:11,src:000000,op:flip1,pos:47	62
+id:000008,sig:11,src:000000,op:havoc,rep:8	62
+id:000009,sig:11,src:000000,op:havoc,rep:8	62
+id:000010,sig:11,src:000000,op:havoc,rep:128	62
